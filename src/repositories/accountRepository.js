@@ -1,12 +1,17 @@
 import { query } from '../db/pool.js';
 
+const genderMap = new Map([
+  ['male', 'Мужской'],
+  ['female', 'Женский']
+]);
+
 const normalizeAccount = (row) => ({
   id: row.id,
   firstName: row.first_name,
   lastName: row.last_name,
   patronymic: row.patronymic,
   email: row.email,
-  gender: row.gender,
+  gender: genderMap.get((row.gender ?? '').toLowerCase()) ?? row.gender,
   age: row.age,
   city: row.city,
   createdAt: row.created_at
