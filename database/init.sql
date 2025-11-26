@@ -10,8 +10,3 @@ CREATE TABLE IF NOT EXISTS accounts (
     city TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
-
-INSERT INTO accounts (first_name, last_name, patronymic, email, password, gender, age, city)
-VALUES
-    ('Иван', 'Иванов', 'Иванович', 'ivan@example.com', 'password123', 'male', 30, 'Москва')
-ON CONFLICT (email) DO NOTHING;

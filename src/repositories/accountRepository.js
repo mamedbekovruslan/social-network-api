@@ -50,11 +50,6 @@ class AccountRepository {
     if (!accountRow) return null;
     return normalizeAccount(accountRow);
   }
-
-  verifyPassword(accountRow, password) {
-    if (!accountRow) return false;
-    return accountRow.password === password;
-  }
 }
 
 export const accountRepository = new AccountRepository();
