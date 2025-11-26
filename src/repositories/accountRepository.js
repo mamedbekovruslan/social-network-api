@@ -27,6 +27,25 @@ class AccountRepository {
     return result.rows[0] ?? null;
   }
 
+  async createAccount(payload) {
+    const result = await query(
+      `INSERT INTO accounts (first_name, last_name, patronymic, email, password, gender, age, city)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id, first_name, last_name, patronymic, email, password, gender, age, city, created_at`,
+      [
+        payload.firstName,
+        payload.lastName,
+        payload.patronymic,
+        payload.email,
+        payload.password,
+        payload.gender,
+        payload.age,
+        payload.city
+      ]
+    );
+    return result.rows[0] ?? null;
+  }
+
   sanitize(accountRow) {
     if (!accountRow) return null;
     return normalizeAccount(accountRow);

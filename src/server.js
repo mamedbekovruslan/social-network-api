@@ -60,6 +60,46 @@ const handleLogin = async (req, res) => {
   sendJSON(res, 200, { account });
 };
 
+const handleRegister = async (req, res) => {
+  const body = await parseJSONBody(req);
+  const firstName = body.firstName?.toString().trim();
+  const lastName = body.lastName?.toString().trim();
+  const patronymic = body.patronymic?.toString().trim() || null;
+  const email = body.email?.toString().trim().toLowerCase();
+  const password = body.password?.toString();
+  const gender = body.gender?.toString().trim().toLowerCase() || null;
+  const ageValue = body.age;
+  const city = body.city?.toString().trim() || null;
+
+  const age = typeof ageValue === 'number' ? ageValue : Number.parseInt(ageValue, 10);
+  const normalizedAge = Number.isFinite(age) ? age : null;
+
+  if (!firstName || !lastName || !email || !password) {
+    sendJSON(res, 400, { message: 'Заполните имя, фамилию, email и пароль' });
+    return;
+  }
+
+  const existingAccount = await accountRepository.findByEmail(email);
+  if (existingAccount) {
+    sendJSON(res, 409, { message: 'Пользователь с таким email уже существует' });
+    return;
+  }
+
+  const accountRow = await accountRepository.createAccount({
+    firstName,
+    lastName,
+    patronymic,
+    email,
+    password,
+    gender,
+    age: normalizedAge,
+    city
+  });
+
+  const account = accountRepository.sanitize(accountRow);
+  sendJSON(res, 201, { account });
+};
+
 const requestHandler = async (req, res) => {
   const { method, headers } = req;
   const url = req.url ?? '/';
@@ -72,6 +112,10 @@ const requestHandler = async (req, res) => {
 
   if (method === 'POST' && requestUrl.pathname === '/api/login') {
     await handleLogin(req, res);
+    return;
+  }
+  if (method === 'POST' && requestUrl.pathname === '/api/register') {
+    await handleRegister(req, res);
     return;
   }
 
